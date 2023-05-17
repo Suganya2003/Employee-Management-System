@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EMPLOYEE DETAILS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">EMPLOYEE MANAGEMENT APPLICATION</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+      </div>
+    </nav>
+      
+    <div class="container">
+      <form id="upload">
+        <label for="file-input">Select Excel File:</label>
+        <input type="file" id="input" name="file" accept=".xlsx">
+        <table id="tbl-data"></table>
+        
+      </form>
+      <button id="download-btn" class="btn btn-primary btn-sm" style="display: none;">Download Table Data</button>
+    </div>
+
+    <script>
+      var input = document.getElementById('input');
+      input.addEventListener('change', function() {
+        readXlsxFile(input.files[0]).then(function(data) {
+          var i = 0;
+          data.map((row, index) => {
+            if (i === 0) {
+              let table = document.getElementById('tbl-data');
+              generateTableHead(table, row);
+            }
+            if (i > 0) {
+              let table = document.getElementById('tbl-data');
+              generateTableRows(table, row);
+            }
+            i++;
+          });
+          document.getElementById('download-btn').style.display = 'block';
+        });
+      });
+
+      function generateTableHead(table, data) {
+        let thead = table.createTHead();
+        let row = thead.insertRow();
+        for (let key of data) {
+          let th = document.createElement('th');
+          let text = document.createTextNode(key);
+          th.appendChild(text);
+          row.appendChild(th);
+        }
+      }
+
+      function generateTableRows(table, data) {
+        let newRow = table.insertRow(-1);
+        data.map((row, index) => {
+          let newCell = newRow.insertCell();
+          let newText = document.createTextNode(row);
+          newCell.appendChild(newText);
+        });
+      }
+
+      document.getElementById('download-btn').addEventListener('click', function() {
+        let table = document.getElementById('tbl-data');
+        let csvContent = '';
+        for (let row of table.rows
+        ) {
+          for (let cell of row.cells) {
+          csvContent += cell.innerText + ',';
+          }
+          csvContent += '\n';
+          }
+          let encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+          let link = document.createElement('a');
+          link.setAttribute('href', encodedUri);
+          link.setAttribute('download', 'table_data.csv');
+          document.body.appendChild(link);
+          link.click();
+          });
+          </script>
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</body>
+</html>
